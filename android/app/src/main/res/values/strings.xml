@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">agritrack</string>
+    <string name="title_activity_main">agritrack</string>
+    <string name="package_name">com.agritrack.app</string>
+    <string name="custom_url_scheme">com.agritrack.app</string>
+</resources>
