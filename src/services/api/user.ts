@@ -1,6 +1,5 @@
 import axios, { AxiosError } from "axios";
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { API_URL } from "./api";
 
 export const login = async (password: string, mail: string) => {
   try {
@@ -22,7 +21,7 @@ export const login = async (password: string, mail: string) => {
       console.error("❌ Error del servidor:", axiosError.response.data);
       throw new Error(
         (axiosError.response.data as { mensaje: string })?.mensaje ||
-          "Error al iniciar sesión"
+        "Error al iniciar sesión"
       );
     }
   }
@@ -50,7 +49,7 @@ export const registerUser = async (userData: {
       console.error("❌ Error del servidor:", axiosError.response.data);
       throw new Error(
         (axiosError.response.data as { mensaje: string })?.mensaje ||
-          "Error al registrar usuario"
+        "Error al registrar usuario"
       );
     }
   }

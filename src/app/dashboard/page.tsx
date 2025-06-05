@@ -6,7 +6,7 @@ import { useCallback, useEffect } from "react";
 
 export default function DashboardPage() {
   const router = useRouter();
-  
+
   const getUser = useCallback(async () => {
     try {
       const response = await obtenerUsuario();

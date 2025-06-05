@@ -68,7 +68,7 @@ export default function Login() {
       <div className="w-1/2 h-32 pb-5">
         <h1>LOGO PLANTA</h1>
       </div>
-      <Card className="w-[350px]">
+      <Card className="w-[90%]">
         <CardHeader>
           <CardTitle>Iniciar Sesión</CardTitle>
           <CardDescription>

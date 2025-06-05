@@ -3,10 +3,14 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Login from "@/components/secundarios/auth/login";
 import Register from "@/components/secundarios/auth/register";
-import { useCallback, useEffect } from "react";
+import { Suspense, useCallback, useEffect } from "react";
 import { obtenerUsuario } from "@/services/api/user";
 
-export default function Home() {
+export default function HomePage() {
+  return <Suspense fallback={<div>Cargando App...</div>}>{<Home />}</Suspense>;
+}
+
+function Home() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -15,9 +19,12 @@ export default function Home() {
   const getUser = useCallback(async () => {
     try {
       const response = await obtenerUsuario();
-      if (response) {
+      if (response.data.user) {
         console.log("Usuario:", response);
         router.push("/dashboard");
+      } else {
+        console.log("Usuario no registrado:", response.data.user);
+        router.push("/");
       }
     } catch (error) {
       console.error("Error al obtener usuario:", error);

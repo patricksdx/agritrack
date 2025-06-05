@@ -85,7 +85,7 @@ export default function Register() {
       <div className="w-1/2 h-32 pb-5">
         <h1>LOGO PLANTA</h1>
       </div>
-      <Card className="w-[400px]">
+      <Card className="w-[90%]">
         <CardHeader>
           <CardTitle>Registro</CardTitle>
           <CardDescription>
