@@ -16,14 +16,14 @@ function Home() {
   const searchParams = useSearchParams();
 
   const showRegister = searchParams.has("register");
+
   const getUser = useCallback(async () => {
     try {
       const response = await obtenerUsuario();
-      if (response.data.user) {
-        console.log("Usuario:", response);
+      const user = response?.user;
+      if (user) {
         router.push("/dashboard");
       } else {
-        console.log("Usuario no registrado:", response.data.user);
         router.push("/");
       }
     } catch (error) {
