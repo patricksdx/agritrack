@@ -27,6 +27,7 @@ import {
 import { mostrarErrorAxios } from "@/services/api/mostrarerror";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 const registerSchema = z.object({
   usuario_username: z
@@ -83,7 +84,13 @@ export default function Register() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-background">
       <div className="w-1/2 h-32 pb-5">
-        <h1>LOGO PLANTA</h1>
+        <Image
+          src={"/logo.png"}
+          alt="Logo"
+          width={200}
+          height={100}
+          className="w-full h-full object-contain"
+        />
       </div>
       <Card className="w-[90%]">
         <CardHeader>

@@ -7,10 +7,18 @@ import Temperatura from "@/components/secundarios/dashboard/temperatura";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { obtenerUsuario } from "@/services/api/user";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect } from "react";
+import { Suspense, useCallback, useEffect } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 
 export default function DashboardPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Dashboard />
+    </Suspense>
+  );
+}
+
+function Dashboard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isPendientes = searchParams.get("pendientes") !== null;
