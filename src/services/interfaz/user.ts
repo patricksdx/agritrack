@@ -1,8 +1,13 @@
 export interface User {
-  usuario_id: number;
-  usuario_username: string;
-  usuario_nombres: string;
-  usuario_apellidos: string;
-  usuario_email: string;
-  usuario_password: string;
+  collectionId: string;
+  collectionName: string;
+  id: string;
+  email: string;
+  emailVisibility: boolean;
+  verified: boolean;
+  nombres: string;
+  apellidos: string;
+  avatar: string;
+  created: string;
+  updated: string;
 }

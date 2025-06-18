@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { App } from "@capacitor/app";
 import {
   Dialog,
@@ -13,10 +13,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { FaAngleLeft } from "react-icons/fa6";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { pb } from "@/services/pocketbase";
+import { User } from "@/services/interfaz/user";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
 export default function Header() {
   const pathname = usePathname();
+  const user = pb.authStore.record;
   const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   const handleBack = () => {
     if (pathname === "/dashboard") {
@@ -36,10 +42,35 @@ export default function Header() {
         <div onClick={handleBack} className="cursor-pointer">
           <FaAngleLeft size={24} />
         </div>
-        <div>
+        <div className="flex items-center gap-4">
           <Search size={20} />
+          <div>
+
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Avatar>
+                  <AvatarImage src={pb.files.getURL(user as User, user?.avatar)} />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="mr-5 mt-2">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>Profile</DropdownMenuItem>
+                <DropdownMenuItem>Billing</DropdownMenuItem>
+                <DropdownMenuItem>Team</DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <Button onClick={() => {
+                    pb.authStore.clear();
+                    router.push("/");
+                  }} variant="ghost" className="p-0 m-0 h-5 text-red-500">Logout</Button>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-      </div>
+      </div >
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>

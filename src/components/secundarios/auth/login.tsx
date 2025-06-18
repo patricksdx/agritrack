@@ -24,10 +24,11 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { mostrarErrorAxios } from "@/services/api/mostrarerror";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { FcGoogle } from "react-icons/fc";
+import { pb } from "@/services/pocketbase";
 
 const loginSchema = z.object({
   mail: z.string().email("Correo electrónico inválido"),
@@ -58,9 +59,8 @@ export default function Login() {
         router.push("/dashboard");
       }
     } catch (error) {
-      const mensajeError = mostrarErrorAxios(error, "Error al iniciar sesión");
       console.error("Error de autenticación:", error);
-      toast.error(mensajeError);
+      toast.error("Error al iniciar sesión");
     }
   };
 
@@ -117,9 +117,16 @@ export default function Login() {
                 )}
               />
             </CardContent>
-            <CardFooter className="mt-5">
+            <CardFooter className="mt-5 flex flex-col gap-2">
               <Button className="w-full" type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Cargando..." : "Iniciar Sesión"}
+              </Button>
+              <Button
+                type="button"
+                onClick={async () => { await pb.collection('users').authWithOAuth2({ provider: 'google' }) }}
+                className="w-full"
+                variant="outline">
+                <FcGoogle />Iniciar con google
               </Button>
             </CardFooter>
           </form>

@@ -24,10 +24,11 @@ import {
   FormControl,
   FormMessage,
 } from "@/components/ui/form";
-import { mostrarErrorAxios } from "@/services/api/mostrarerror";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
 const registerSchema = z.object({
   usuario_username: z
@@ -43,12 +44,21 @@ const registerSchema = z.object({
   usuario_password: z
     .string()
     .min(6, "La contraseña debe tener al menos 6 caracteres"),
+  confirmar_password: z
+    .string()
+    .min(6, "La contraseña debe tener al menos 6 caracteres"),
+}).refine((data) => data.usuario_password === data.confirmar_password, {
+  message: "Las contraseñas no coinciden",
+  path: ["confirmar_password"],
 });
 
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function Register() {
   const router = useRouter();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -57,6 +67,7 @@ export default function Register() {
       usuario_apellidos: "",
       usuario_email: "",
       usuario_password: "",
+      confirmar_password: "",
     },
   });
 
@@ -64,7 +75,13 @@ export default function Register() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      const response = await registerUser(data);
+      const response = await registerUser(
+        data.usuario_email,
+        data.usuario_nombres,
+        data.usuario_apellidos,
+        data.usuario_password,
+        data.usuario_password
+      );
       console.log(response);
 
       if (response) {
@@ -72,12 +89,8 @@ export default function Register() {
         router.push("/");
       }
     } catch (error) {
-      const mensajeError = mostrarErrorAxios(
-        error,
-        "Error al registrar usuario"
-      );
       console.error("Error de registro:", error);
-      toast.error(mensajeError);
+      toast.error("Error al registrar usuario");
     }
   };
 
@@ -178,7 +191,59 @@ export default function Register() {
                   <FormItem>
                     <Label htmlFor="usuario_password">Contraseña</Label>
                     <FormControl>
-                      <Input id="usuario_password" type="password" {...field} />
+                      <div className="relative">
+                        <Input
+                          id="usuario_password"
+                          type={showPassword ? "text" : "password"}
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="confirmar_password"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label htmlFor="confirmar_password">Confirmar contraseña</Label>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          id="confirmar_password"
+                          type={showConfirmPassword ? "text" : "password"}
+                          {...field}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        >
+                          {showConfirmPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -5,9 +5,8 @@ import CardResumen from "@/components/secundarios/dashboard/cardResumen";
 import Nav from "@/components/secundarios/dashboard/nav";
 import Temperatura from "@/components/secundarios/dashboard/temperatura";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
-import { obtenerUsuario } from "@/services/api/user";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useCallback, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 
 export default function DashboardPage() {
@@ -19,7 +18,6 @@ export default function DashboardPage() {
 }
 
 function Dashboard() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const isPendientes = searchParams.get("pendientes") !== null;
   const [emblaRef] = useEmblaCarousel({
@@ -28,25 +26,8 @@ function Dashboard() {
     slidesToScroll: 1,
   });
 
-  const getUser = useCallback(async () => {
-    try {
-      const response = await obtenerUsuario();
-      if (response) {
-        router.push("/dashboard");
-      }
-    } catch (error) {
-      console.error("Error al obtener usuario:", error);
-      router.push("/");
-    }
-  }, [router]);
-
-  useEffect(() => {
-    getUser();
-  }, [getUser]);
-
   const words = isPendientes ? `Pendientes` : `Mis Plantas`;
 
-  // Datos de ejemplo para las plantas
   const plantas = [
     { id: 1, nombre: "Planta 1" },
     { id: 2, nombre: "Planta 2" },
