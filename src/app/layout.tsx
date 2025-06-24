@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ui/themeProvider";
 import { Toaster } from "@/components/ui/sonner";
+import ShowAlertDialog from "@/lib/context/AlertDialogContext";
 
 export const metadata: Metadata = {
   title: "Agritrack",
@@ -24,6 +25,7 @@ export default function RootLayout({
         >
           {children}
           <Toaster />
+          <ShowAlertDialog />
         </ThemeProvider>
       </body>
     </html>

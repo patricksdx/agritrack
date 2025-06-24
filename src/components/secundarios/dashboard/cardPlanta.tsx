@@ -1,7 +1,12 @@
+import { Planta } from "@/services/interfaz/planta";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-export default function CardPlanta() {
+interface CardPlantaProps {
+  planta: Planta;
+}
+
+export default function CardPlanta({ planta }: CardPlantaProps) {
   const router = useRouter();
 
   const handleClick = (id: string) => {
@@ -10,14 +15,14 @@ export default function CardPlanta() {
 
   return (
     <div
-      onClick={() => handleClick("1")}
-      className="flex flex-col gap-4 p-4 border-2 bg-primary text-secondary w-full rounded-lg"
+      onClick={() => handleClick(planta.id)}
+      className="flex flex-col gap-4 p-4 border-2 bg-primary text-secondary w-full h-full rounded-lg"
     >
-      <Image src="/images/planta.png" alt="Planta" width={200} height={200} />
-      <div>Nombre de la planta</div>
-      <div>Estado de la planta</div>
-      <div>Fecha de la última actualización</div>
-      <div>Descripcion</div>
+      <Image src={planta.foto ? planta.foto : "/images/planta.png"} alt={planta.nombre} width={200} height={200} />
+      <div>{planta.nombre}</div>
+      <div>{planta.descripcion || "Sin descripción"}</div>
+      <div>{planta.ubicacion || "Sin ubicación"}</div>
+      <div>{planta.created ? new Date(planta.created).toLocaleDateString() : ""}</div>
     </div>
   );
 }

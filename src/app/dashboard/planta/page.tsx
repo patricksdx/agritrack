@@ -1,124 +1,208 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { getPlantasByUser, updatePlanta, deletePlanta } from "@/services/api/planta";
+import { Planta } from "@/services/interfaz/planta";
+import { pb } from "@/services/pocketbase";
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
-import { Droplets, Sun, Thermometer } from "lucide-react";
+import { Droplets, Sun, Thermometer, Trash2, Edit2 } from "lucide-react";
 import Image from "next/image";
+import { useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
+import { MoreVertical } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { showAlertDialog } from "@/lib/context/AlertDialogContext";
 
 export default function DashboardPlantaPage() {
-  // Datos de ejemplo - estos vendrían de tu API
-  const planta = {
-    nombre: "Monstera Deliciosa",
-    nombreCientifico: "Monstera deliciosa",
-    imagen: "/monstera.jpg", // Asegúrate de tener esta imagen en tu carpeta public
-    cuidados: {
-      agua: "Moderada",
-      temperatura: "20-25°C",
-      luz: "Indirecta brillante",
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const plantaId = searchParams.keys().next().value || "";
+  const [planta, setPlanta] = useState<Planta | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+
+  const form = useForm<Partial<Planta>>({
+    defaultValues: {
+      nombre: "",
+      descripcion: "",
+      ubicacion: "",
+      tipo: "",
     },
-    recomendaciones: [
-      "Regar cuando el suelo esté seco al tacto",
-      "Mantener en un lugar con buena ventilación",
-      "Limpiar las hojas regularmente",
-    ],
-    cuidadosEspecificos: [
-      {
-        titulo: "Riego",
-        descripcion:
-          "Regar moderadamente, permitiendo que el suelo se seque entre riegos",
-      },
-      {
-        titulo: "Luz",
-        descripcion: "Prefiere luz indirecta brillante, evitar el sol directo",
-      },
-      {
-        titulo: "Humedad",
-        descripcion: "Mantener humedad ambiental alta, ideal entre 60-80%",
-      },
-    ],
+  });
+
+  const fetchPlanta = async () => {
+    const user = pb.authStore.model || pb.authStore.record;
+    if (!user?.id) return;
+    const plantas = await getPlantasByUser(user.id);
+    const found = plantas.find((p) => p.id === plantaId);
+    setPlanta(found || null);
+    if (found) {
+      form.reset({
+        nombre: found.nombre,
+        descripcion: found.descripcion,
+        ubicacion: found.ubicacion,
+        tipo: found.tipo,
+      });
+    }
   };
+
+  useEffect(() => {
+    fetchPlanta();
+    // eslint-disable-next-line
+  }, []);
+
+  const onSubmit = async (data: Partial<Planta>) => {
+    if (!planta) return;
+    const updated = await updatePlanta(planta.id, data);
+    if (updated) {
+      toast.success("Planta actualizada");
+      setEditOpen(false);
+      fetchPlanta();
+    } else {
+      toast.error("Error al actualizar");
+    }
+  };
+
+  const onDelete = async () => {
+    if (!planta) return;
+    showAlertDialog({
+      title: "¿Estás seguro?",
+      description: "Esta acción no se puede deshacer",
+      variant: "destructive",
+      confirmable: true,
+      action: async () => {
+        const ok = await deletePlanta(planta.id);
+        if (ok) {
+          toast.success("Planta eliminada");
+          router.push("/dashboard");
+        } else {
+          toast.error("Error al eliminar");
+        }
+      }
+    })
+  };
+
+  if (!planta) return <div className="p-8">Cargando planta...</div>;
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Título y nombre científico */}
-      <div className="mb-8">
-        <TextGenerateEffect words={planta.nombre} />
-        <p className="text-gray-500 text-lg mt-2">{planta.nombreCientifico}</p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <TextGenerateEffect words={planta.nombre} />
+          <p className="text-gray-500 text-lg mt-2">ID: {planta.id}</p>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="icon" variant="outline" className="rounded-full">
+              <MoreVertical className="w-5 h-5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setEditOpen(true)}>
+              <Edit2 className="w-4 h-4 mr-2" /> Editar
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={onDelete} className="text-red-600">
+              <Trash2 className="w-4 h-4 mr-2" /> Borrar
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <Dialog open={editOpen} onOpenChange={setEditOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Editar planta</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <Input placeholder="Nombre" {...form.register("nombre", { required: true })} />
+              <Input placeholder="Descripción" {...form.register("descripcion")} />
+              <Input placeholder="Ubicación" {...form.register("ubicacion")} />
+              <Select
+                value={form.watch("tipo")}
+                onValueChange={(value: string) => form.setValue("tipo", value)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Tipo de planta" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Tipo</SelectLabel>
+                    <SelectItem value="interior">Interior</SelectItem>
+                    <SelectItem value="exterior">Exterior</SelectItem>
+                    <SelectItem value="suculenta">Suculenta</SelectItem>
+                    <SelectItem value="arbol">Árbol</SelectItem>
+                    <SelectItem value="flor">Flor</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <DialogFooter>
+                <Button type="submit">Guardar</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
-
-      {/* Imagen */}
       <div className="w-full h-[400px] mb-8 rounded-lg overflow-hidden">
         <Image
           width={800}
           height={800}
-          src={planta.imagen}
+          src={planta.foto ? planta.foto : "/images/planta.png"}
           alt={planta.nombre}
           className="w-full h-full object-cover"
         />
       </div>
-
-      {/* Sección de cuidados básicos */}
       <div className="bg-primary rounded-t-4xl absolute left-0">
         <div className="p-6 mb-8">
-          <h2 className="text-2xl font-semibold mb-6 text-white">
-            Cuidados Básicos
-          </h2>
+          <h2 className="text-2xl font-semibold mb-6 text-white">Datos</h2>
           <div className="grid grid-cols-3 gap-6">
             <div className="bg-white/10 rounded-lg p-4 flex flex-col justify-between items-center gap-3">
               <Droplets className="w-8 h-8 text-white" />
               <div className="flex flex-col gap-1 items-center">
-                <p className="text-white/80 text-sm">Agua</p>
-                <p className="text-white font-semibold">
-                  {planta.cuidados.agua}
-                </p>
+                <p className="text-white/80 text-sm">Humedad</p>
+                <p className="text-white font-semibold">{planta.humedad ?? "-"}</p>
               </div>
             </div>
             <div className="bg-white/10 rounded-lg p-4 flex flex-col justify-between items-center gap-3">
               <Thermometer className="w-8 h-8 text-white" />
               <div className="flex flex-col gap-1 items-center">
                 <p className="text-white/80 text-sm">Temperatura</p>
-                <p className="text-white font-semibold">
-                  {planta.cuidados.temperatura}
-                </p>
+                <p className="text-white font-semibold">{planta.temparatura ?? "-"}</p>
               </div>
             </div>
             <div className="bg-white/10 rounded-lg p-4 flex flex-col justify-between items-center gap-3">
               <Sun className="w-8 h-8 text-white" />
               <div className="flex flex-col gap-1 items-center">
                 <p className="text-white/80 text-sm">Luz</p>
-                <p className="text-white font-semibold">
-                  {planta.cuidados.luz}
-                </p>
+                <p className="text-white font-semibold">{planta.luz ?? "-"}</p>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Sección de recomendaciones */}
         <div className="text-white p-6 mb-8">
-          <h2 className="text-2xl font-semibold mb-6">Recomendaciones</h2>
-          <ul className="space-y-3">
-            {planta.recomendaciones.map((rec, index) => (
-              <li key={index} className="flex items-start gap-2">
-                <span className="text-primary">•</span>
-                <p>{rec}</p>
-              </li>
-            ))}
-          </ul>
+          <h2 className="text-2xl font-semibold mb-6">Descripción</h2>
+          <p>{planta.descripcion || "Sin descripción"}</p>
         </div>
-
-        {/* Sección de cuidados específicos */}
         <div className="text-white p-6">
-          <h2 className="text-2xl font-semibold mb-6">Cuidados Específicos</h2>
-          <div className="grid gap-6">
-            {planta.cuidadosEspecificos.map((cuidado, index) => (
-              <div key={index} className="border rounded-lg p-4">
-                <h3 className="font-semibold text-lg mb-2">{cuidado.titulo}</h3>
-                <p className="">{cuidado.descripcion}</p>
-              </div>
-            ))}
-          </div>
+          <h2 className="text-2xl font-semibold mb-6">Ubicación</h2>
+          <p>{planta.ubicacion || "Sin ubicación"}</p>
         </div>
       </div>
     </div>
   );
 }
+

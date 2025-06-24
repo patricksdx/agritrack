@@ -11,7 +11,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Search } from "lucide-react";
 import { FaAngleLeft } from "react-icons/fa6";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { pb } from "@/services/pocketbase";
@@ -43,9 +42,7 @@ export default function Header() {
           <FaAngleLeft size={24} />
         </div>
         <div className="flex items-center gap-4">
-          <Search size={20} />
           <div>
-
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Avatar>

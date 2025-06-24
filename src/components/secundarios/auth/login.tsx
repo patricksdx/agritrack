@@ -52,8 +52,6 @@ export default function Login() {
   const onSubmit = async (data: LoginFormData) => {
     try {
       const response = await login(data.password, data.mail);
-      console.log(response);
-
       if (response) {
         toast.success("Inicio de sesión exitoso");
         router.push("/dashboard");
