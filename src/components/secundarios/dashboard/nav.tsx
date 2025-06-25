@@ -12,18 +12,17 @@ export default function Nav() {
         <li>
           <Link href="/dashboard">
             <span
-              className={`${
-                pathname === "/dashboard" && !isPendientes
+              className={`${pathname === "/dashboard" && !isPendientes
                   ? "font-semibold"
                   : "font-normal"
-              }`}
+                }`}
             >
               Mis Plantas
             </span>
           </Link>
         </li>
         <li>
-          <Link href="/dashboard?pendientes">
+          <Link href="/dashboard/pendientes">
             <span
               className={`${isPendientes ? "font-semibold" : "font-normal"}`}
             >

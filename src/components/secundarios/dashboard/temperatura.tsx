@@ -31,7 +31,7 @@ export default function Temperatura() {
   }, []);
 
   return (
-    <div className="w-full bg-background rounded-lg shadow-2xl p-6 my-4">
+    <div className="w-full bg-background rounded-lg shadow-2xl p-6 my-4 border">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Cloud className="w-8 h-8 text-blue-500" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { App } from "@capacitor/app";
 import {
@@ -34,6 +34,36 @@ export default function Header() {
   const cerrarApp = async () => {
     await App.exitApp();
   };
+
+  const generarConsejos = useCallback(async () => {
+    try {
+      const res = await fetch('http://localhost:11434/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'gemma3:12b',
+          prompt: 'Dame 5 consejos para cuidar una planta en un departamento',
+          stream: false
+        }),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("Error:", res.status, errorText);
+        return;
+      }
+
+      const data = await res.json();
+      console.log("Respuesta de Ollama:", data);
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
+    }
+  }, []);
+
+
+  useEffect(() => {
+    generarConsejos();
+  }, []);
 
   return (
     <>

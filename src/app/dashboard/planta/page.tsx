@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getPlantasByUser, updatePlanta, deletePlanta } from "@/services/api/planta";
 import { Planta } from "@/services/interfaz/planta";
 import { pb } from "@/services/pocketbase";
-import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 import { Droplets, Sun, Thermometer, Trash2, Edit2 } from "lucide-react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
@@ -31,7 +30,7 @@ import {
 } from "@/components/ui/select";
 import { showAlertDialog } from "@/lib/context/AlertDialogContext";
 
-export default function DashboardPlantaPage() {
+function DashboardPlanta() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const plantaId = searchParams.keys().next().value || "";
@@ -102,11 +101,10 @@ export default function DashboardPlantaPage() {
   if (!planta) return <div className="p-8">Cargando planta...</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 mt-5">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <TextGenerateEffect words={planta.nombre} />
-          <p className="text-gray-500 text-lg mt-2">ID: {planta.id}</p>
+          <h1 className="text-3xl font-medium">{planta.nombre}</h1>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -119,7 +117,7 @@ export default function DashboardPlantaPage() {
               <Edit2 className="w-4 h-4 mr-2" /> Editar
             </DropdownMenuItem>
             <DropdownMenuItem onClick={onDelete} className="text-red-600">
-              <Trash2 className="w-4 h-4 mr-2" /> Borrar
+              <Trash2 className="w-4 h-4 mr-2 text-red-600" /> Borrar
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -161,9 +159,10 @@ export default function DashboardPlantaPage() {
         <Image
           width={800}
           height={800}
-          src={planta.foto ? planta.foto : "/images/planta.png"}
+          src={pb.files.getURL(planta, planta.foto as string)}
           alt={planta.nombre}
           className="w-full h-full object-cover"
+          priority
         />
       </div>
       <div className="bg-primary rounded-t-4xl absolute left-0">
@@ -202,7 +201,10 @@ export default function DashboardPlantaPage() {
           <p>{planta.ubicacion || "Sin ubicación"}</p>
         </div>
       </div>
-    </div>
+    </div >
   );
 }
 
+export default function DashboardPlantaPage() {
+  return <Suspense fallback={<div>Loading...</div>}><DashboardPlanta /></Suspense>;
+}

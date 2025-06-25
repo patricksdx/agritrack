@@ -6,6 +6,7 @@ export const getPlantasByUser = async (userId: string): Promise<Planta[]> => {
     const result = await pb.collection("Plantas").getFullList<Planta>({
       filter: `Users = "${userId}"`,
       sort: "-created",
+      requestKey: null,
     });
     return result;
   } catch (error) {
