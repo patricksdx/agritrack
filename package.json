@@ -17,10 +17,7 @@
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-avatar": "^1.1.10",
-<<<<<<< HEAD
-=======
     "@radix-ui/react-context-menu": "^2.2.15",
->>>>>>> a74149b (first commit)
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@radix-ui/react-label": "^2.1.7",
@@ -39,14 +36,9 @@
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.56.4",
     "react-icons": "^5.5.0",
-<<<<<<< HEAD
-    "sonner": "^2.0.4",
-    "tailwind-merge": "^3.3.0",
-=======
     "sonner": "^2.0.5",
     "tailwind-merge": "^3.3.0",
     "xlsx": "^0.18.5",
->>>>>>> a74149b (first commit)
     "zod": "^3.25.42"
   },
   "devDependencies": {
