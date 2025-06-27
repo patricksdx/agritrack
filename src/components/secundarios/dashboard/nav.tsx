@@ -5,6 +5,10 @@ export default function Nav() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const isPendientes = searchParams.get("pendientes") !== null;
+<<<<<<< HEAD
+=======
+  const isObservaciones = searchParams.get("observaciones") !== null;
+>>>>>>> a74149b (first commit)
 
   return (
     <nav className="py-4">
@@ -12,7 +16,11 @@ export default function Nav() {
         <li>
           <Link href="/dashboard">
             <span
+<<<<<<< HEAD
               className={`${pathname === "/dashboard" && !isPendientes
+=======
+              className={`${pathname === "/dashboard" && !isPendientes && !isObservaciones
+>>>>>>> a74149b (first commit)
                   ? "font-semibold"
                   : "font-normal"
                 }`}
@@ -30,6 +38,18 @@ export default function Nav() {
             </span>
           </Link>
         </li>
+<<<<<<< HEAD
+=======
+        <li>
+          <Link href="/dashboard/observaciones">
+            <span
+              className={`${isObservaciones ? "font-semibold" : "font-normal"}`}
+            >
+              Observaciones
+            </span>
+          </Link>
+        </li>
+>>>>>>> a74149b (first commit)
       </ul>
     </nav>
   );
